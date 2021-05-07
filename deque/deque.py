@@ -4,10 +4,13 @@ There is a double ended queue implementation.
 from abc import ABC, abstractmethod
 
 
-class DequeMeta(ABC):
-    def __init__(self, mix_size=0):
-        self._head, self._tail = None, None
-        self._data = [] * mix_size
+class DequeException(Exception):
+    """
+    The module base exception
+    """
+
+
+class DequeAbstract(ABC):
 
     @abstractmethod
     def push_back(self, value):
@@ -18,31 +21,53 @@ class DequeMeta(ABC):
         pass
 
     @abstractmethod
-    def pop_front(self):
+    def pop_back(self):
         pass
 
     @abstractmethod
-    def pop_back(self):
-        pass
-
-
-class Deque(DequeMeta):
-    def push_front(self, value):
-        pass
-
-    def push_back(self, value):
-        pass
-
     def pop_front(self):
         pass
 
+
+class Deque(DequeAbstract):
+    """
+    The main class contains double ended queue implementation.
+    """
+    def __init__(self, max_size=0):
+        self._head, self._tail, self._size = 0, 0, 0
+        self._max_size = max_size
+        self._data = [float('inf')] * max_size
+
+    def __repr__(self):
+        return str(self._data)
+
+    def push_back(self, value):
+        if indx := (self._tail + 1) % self._max_size == self._head:
+            raise DequeException('overflow')
+
+        self._tail, self._data[self._tail] = indx, value
+        self._size += 1
+
+    def push_front(self, value):
+        if self._head == (self._tail + 1) % self._max_size:
+            raise DequeException('overflow')
+
+        self._head = (self._head - 1 + self._max_size) % self._max_size
+        self._data[self._head] = value
+        self._size += 1
+
     def pop_back(self):
-        pass
+        if self._size == 0:
+            raise DequeException('underflow')
 
+        self._tail = (self._tail - 1 + self._max_size) % self._max_size
+        self._size -= 1
+        return self._data[self._tail]
 
-"""
-push_back(value) – добавить элемент в конец дека. Если в деке уже находится максимальное число элементов, вывести «error».
-push_front(value) – добавить элемент в начало дека. Если в деке уже находится максимальное число элементов, вывести «error».
-pop_front() – вывести первый элемент дека и удалить его. Если дек был пуст, то вывести «error».
-pop_back() – вывести последний элемент дека и удалить его. Если дек был пуст, то вывести «error».
-"""
+    def pop_front(self):
+        if self._size == 0:
+            raise DequeException('underflow')
+
+        result, self._head = self._data[self._head], (self._head + 1) % self._max_size
+        self._size -= 1
+        return result
