@@ -41,11 +41,18 @@ class Deque(DequeAbstract):
     def __repr__(self):
         return str(self._data)
 
+    def __len__(self):
+        return self._size
+
+    @property
+    def max_size(self) -> int:
+        return self._max_size
+
     def push_back(self, value):
-        if indx := (self._tail + 1) % self._max_size == self._head:
+        if (indx := (self._tail + 1) % self._max_size) == self._head:
             raise DequeException('overflow')
 
-        self._tail, self._data[self._tail] = indx, value
+        self._data[self._tail], self._tail = value, indx
         self._size += 1
 
     def push_front(self, value):
@@ -68,6 +75,6 @@ class Deque(DequeAbstract):
         if self._size == 0:
             raise DequeException('underflow')
 
-        result, self._head = self._data[self._head], (self._head + 1) % self._max_size
+        self._head, result = (self._head + 1) % self._max_size, self._data[self._head]
         self._size -= 1
         return result
