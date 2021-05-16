@@ -1,6 +1,7 @@
 """
 There is a double ended queue implementation.
 """
+from typing import Any
 from abc import ABC, abstractmethod
 
 
@@ -13,19 +14,19 @@ class DequeException(Exception):
 class DequeAbstract(ABC):
 
     @abstractmethod
-    def push_back(self, value):
+    def push_back(self, value: Any):
         pass
 
     @abstractmethod
-    def push_front(self, value):
+    def push_front(self, value: Any):
         pass
 
     @abstractmethod
-    def pop_back(self):
+    def pop_back(self) -> Any:
         pass
 
     @abstractmethod
-    def pop_front(self):
+    def pop_front(self) -> Any:
         pass
 
 
@@ -48,22 +49,26 @@ class Deque(DequeAbstract):
     def max_size(self) -> int:
         return self._max_size
 
-    def push_back(self, value):
-        if (indx := (self._tail + 1) % self._max_size) == self._head:
+    @property
+    def is_overflow(self) -> bool:
+        return self._size >= self._max_size
+
+    def push_back(self, value: Any):
+        if self.is_overflow:
             raise DequeException('overflow')
 
-        self._data[self._tail], self._tail = value, indx
+        self._data[self._tail], self._tail = value, (self._tail + 1) % self._max_size
         self._size += 1
 
-    def push_front(self, value):
-        if self._head == (self._tail + 1) % self._max_size:
+    def push_front(self, value: Any):
+        if self.is_overflow:
             raise DequeException('overflow')
 
         self._head = (self._head - 1 + self._max_size) % self._max_size
         self._data[self._head] = value
         self._size += 1
 
-    def pop_back(self):
+    def pop_back(self) -> Any:
         if self._size == 0:
             raise DequeException('underflow')
 
@@ -71,7 +76,7 @@ class Deque(DequeAbstract):
         self._size -= 1
         return self._data[self._tail]
 
-    def pop_front(self):
+    def pop_front(self) -> Any:
         if self._size == 0:
             raise DequeException('underflow')
 

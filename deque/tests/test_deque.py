@@ -9,6 +9,7 @@ class TestDeque(TestCase):
     def setUp(self) -> None:
         self.deque = Deque(self.size)
         self.full_deque = Deque(self.size)
+        self.full_deque._size = 3
         self.full_deque._data = [i for i in range(self.size)]
 
     def test_max_size(self):
@@ -39,7 +40,7 @@ class TestDeque(TestCase):
             self.assertTrue('overflow' in context.exception)
 
     def test_pop_back(self):
-        for i in range(self.size):
+        for i in reversed(range(self.size)):
             self.assertEqual(i, self.full_deque.pop_back())
 
         with self.assertRaises(DequeException) as context:
@@ -47,7 +48,7 @@ class TestDeque(TestCase):
             self.assertTrue('underflow' in context.exception)
 
     def test_pop_front(self):
-        for i in reversed(range(self.size)):
+        for i in range(self.size):
             self.assertEqual(i, self.full_deque.pop_front())
 
         with self.assertRaises(DequeException) as context:
